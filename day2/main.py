@@ -22,12 +22,13 @@ class HandPlay:
         self.score = PLAYS[char][3]
 
     def battle(self, other):
-        if self.played == other.counterplay:
-            return 6
-        elif self.played == other.played:
-            return 3
-        else:
-            return 0
+        match self.played:
+            case other.counterplay:
+                return 6
+            case other.played:
+                return 3
+            case _:
+                return 0
 
 
 def simplify_to_list(input):
