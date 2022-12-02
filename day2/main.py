@@ -1,6 +1,8 @@
-ME = {"X": 1, "Y": 2, "Z": 3}
-OPPONENT = {"A": ME["X"], "B": ME["Y"], "C": ME["Z"]}
-OUTCOME = {"WIN": 6, "DRAW": 3, "LOSS": 0}
+PLAYS = {
+    "A": ("A", "B", "C", 1),
+    "B": ("B", "C", "A", 2),
+    "C": ("C", "A", "B", 3),
+}
 
 
 def main():
@@ -12,6 +14,22 @@ def main():
     print(total_score)
 
 
+class HandPlay:
+    def __init__(self, char):
+        self.played = PLAYS[char][0]
+        self.counterplay = PLAYS[char][1]
+        self.winplay = PLAYS[char][2]
+        self.score = PLAYS[char][3]
+
+    def battle(self, other):
+        if self.played == other.counterplay:
+            return 6
+        elif self.played == other.played:
+            return 3
+        else:
+            return 0
+
+
 def simplify_to_list(input):
     res = input.split("\n")[:-1]
     return res
@@ -19,25 +37,27 @@ def simplify_to_list(input):
 
 def count_total_score1(str_list):
     total_score = 0
+    MY_PLAYS = {"X": "A", "Y": "B", "Z": "C"}
     for str in str_list:
-        total_score += (
-            ME[str[-1]]
-            + OUTCOME["WIN"] * (ME[str[-1]] == round((OPPONENT[str[0]] + 1) % 3.1))
-            + OUTCOME["DRAW"] * (ME[str[-1]] == OPPONENT[str[0]])
-            + OUTCOME["LOSS"] * (round((ME[str[-1]] + 1) % 3.1) == OPPONENT[str[0]])
-        )
+        opponent_play = HandPlay(str[0])
+        my_play = HandPlay(MY_PLAYS[str[-1]])
+        total_score += my_play.score + my_play.battle(opponent_play)
+
     return total_score
 
 
 def count_total_score_2(str_list):
     total_score = 0
     for str in str_list:
-        total_score += (
-            (OUTCOME["WIN"] + round((OPPONENT[str[0]] + 1) % 3.1)) * (str[-1] == "Z")
-            + (OUTCOME["DRAW"] + OPPONENT[str[0]]) * (str[-1] == "Y")
-            + (OUTCOME["LOSS"] + (OPPONENT[str[0]] - 1 if str[0] != "A" else 3))
-            * (str[-1] == "X")
-        )
+        opponent_play = HandPlay(str[0])
+        match str[-1]:
+            case "X":
+                my_play = HandPlay(opponent_play.winplay)
+            case "Y":
+                my_play = HandPlay(opponent_play.played)
+            case "Z":
+                my_play = HandPlay(opponent_play.counterplay)
+        total_score += my_play.score + my_play.battle(opponent_play)
     return total_score
 
 
